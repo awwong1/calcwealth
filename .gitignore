@@ -26,7 +26,8 @@ yarn-error.log*
 
 # local env files
 .env.local
-.env.development.local
+.env.development.localimport { NextComponentType, NextPageContext } from "next";
+
 .env.test.local
 .env.production.local
 
@@ -218,3 +219,6 @@ dist
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
+
+# Cypress headless test output
+cypress/videos
