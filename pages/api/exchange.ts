@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import fetchTimeout from "../../utils/fetchTimeout";
 import fs from "fs";
+import { SUPPORTED_CURRENCIES } from "../../utils/currencyConverter";
 
 /**
  * Endpoint for retrieving the different currencies and conversion rates.
@@ -8,7 +9,10 @@ import fs from "fs";
  *
  * https://exchangeratesapi.io
  */
-export default (req: NextApiRequest, res: NextApiResponse): Promise<void> | void => {
+export default (
+  req: NextApiRequest,
+  res: NextApiResponse
+): Promise<void> | void => {
   const { method } = req;
   if (method != "GET") {
     res.setHeader("Allow", ["GET"]);
@@ -17,7 +21,10 @@ export default (req: NextApiRequest, res: NextApiResponse): Promise<void> | void
   }
 
   // Query the exchangeratesapi with the provided base, or fallback
-  return fetchTimeout(`https://api.exchangeratesapi.io/latest?base=CAD`)
+  const symbols = SUPPORTED_CURRENCIES.join(",");
+  return fetchTimeout(
+    `https://api.exchangeratesapi.io/latest?base=CAD&symbols=${symbols}`
+  )
     .then((resp) => resp.json())
     .then((jsonResp) => {
       res.statusCode = 200;

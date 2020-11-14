@@ -30,7 +30,7 @@ export default context("Exchange API Endpoint", () => {
         "HKD",
         "MXN",
         "GBP",
-        "CHF",
+        "KRW",
         "INR",
       ]);
   });
