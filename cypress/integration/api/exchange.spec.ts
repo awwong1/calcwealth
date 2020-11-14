@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-context("Exchange API Endpoint", () => {
+export default context("Exchange API Endpoint", () => {
   beforeEach(() => {
     cy.request("http://localhost:3000/api/exchange").as("rate");
   });

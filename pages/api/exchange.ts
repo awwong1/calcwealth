@@ -4,7 +4,7 @@ import fs from "fs";
 
 /**
  * Endpoint for retrieving the different currencies and conversion rates.
- * Relies on the exchangeratesapi, or fallback to serving the JSON file.
+ * Relies on the exchangeratesapi, or fallback to serving the local JSON file.
  *
  * https://exchangeratesapi.io
  */

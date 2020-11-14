@@ -10,6 +10,7 @@ module.exports = {
     "prettier/@typescript-eslint",
   ],
   env: {
-    "cypress/globals": true
+    "cypress/globals": true,
+    "node": true
   }
 };
