@@ -1,7 +1,24 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import fetchTimeout from "../../utils/fetchTimeout";
 import fs from "fs";
-import { SUPPORTED_CURRENCIES } from "../../utils/currencyConverter";
+import { SUPPORTED_CURRENCIES } from "../../utils/convertCurrency";
+
+export interface ratesPayload {
+  "rates": {
+    "CAD": number,
+    "INR": number,
+    "EUR": number,
+    "HKD": number,
+    "MXN": number,
+    "USD": number,
+    "GBP": number,
+    "KRW": number,
+    "CNY": number,
+    "JPY": number
+  },
+  "base": string,
+  "date": string
+}
 
 /**
  * Endpoint for retrieving the different currencies and conversion rates.

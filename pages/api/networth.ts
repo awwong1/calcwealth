@@ -1,8 +1,19 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-type payload = {
-  assets?: [number];
-  liabilities?: [number];
+interface IPayload {
+  assets: Array<number | string>;
+  liabilities: Array<number | string>;
+}
+
+const _parseFloatZero = (val: number | string): number => {
+  if (typeof val === "string") {
+    const parsedNumber = Number.parseFloat(val);
+    if (Number.isFinite(parsedNumber)) {
+      return parsedNumber;
+    }
+    return 0;
+  }
+  return val;
 };
 
 /**
@@ -12,16 +23,18 @@ type payload = {
  * net worth is the total assets minus the total liabilities.
  */
 export default (req: NextApiRequest, res: NextApiResponse): void => {
-  const { method, body }: { method?: string; body: payload } = req;
+  const { method, body }: { method?: string; body: string } = req;
   if (method != "POST") {
     res.setHeader("Allow", ["POST"]);
     res.status(405).end(`Method ${method} Not Allowed`);
     return;
   }
+  const add = (a: number | string, b: number | string): number =>
+    _parseFloatZero(a) + _parseFloatZero(b);
 
-  const add = (a: number, b: number) => a + b;
-  const totalAssets = (body.assets || [0]).reduce(add, 0);
-  const totalLiabilities = (body.liabilities || [0]).reduce(add, 0);
+  const payload: IPayload = JSON.parse(body);
+  const totalAssets = payload.assets.reduce(add, 0) as number;
+  const totalLiabilities = payload.liabilities.reduce(add, 0) as number;
   const netWorth = totalAssets - totalLiabilities;
 
   res.statusCode = 200;

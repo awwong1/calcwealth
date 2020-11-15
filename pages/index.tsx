@@ -17,15 +17,15 @@ const Home = (): JSX.Element => (
     </Head>
 
     <header>
-      <Container>
-        <Heading>Tracking your Networth</Heading>
+      <Container paddingY={"1em"} maxW={"90ch"}>
+        <Heading>Tracking your Net Worth</Heading>
       </Container>
     </header>
 
     <Dashboard />
 
     <footer>
-      <Container>
+      <Container maxW={"90ch"}>
         <Divider />
         <Text>
           A takehome assessment by{" "}

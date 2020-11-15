@@ -1,76 +1,154 @@
-import { Component, ReactEventHandler } from "react";
+import { Component, FocusEventHandler } from "react";
 import DashboardView from "./dashboardView";
+import fetchTimeout from "../utils/fetchTimeout";
+import { ratesPayload } from "../pages/api/exchange";
+import { currency, IAssets, ILiabilities } from "../types";
+import { convertCurrency } from "../utils/convertCurrency";
 
 type IProps = Record<string, unknown>;
 
 interface IState {
-  selectedCurrency: string;
-  assets: {
-    chequing: number;
-    savingTaxes: number;
-    rainyDay: number;
-    savingFun: number;
-    savingTravel: number;
-    savingPD: number;
-    invest1: number;
-    invest2: number;
-    invest3: number;
-    primaryHome: number;
-    secondHome: number;
-    other: number;
-  };
-  liabilities: {
-    creditCard1: number;
-    creditCard2: number;
-    mortgage1: number;
-    mortgage2: number;
-    lineCredit: number;
-    investmentLoan: number;
-  };
+  loading: boolean;
+  selectedCurrency: currency;
+  totalAssets: number;
+  totalLiabilities: number;
+  netWorth: number;
+  rates?: ratesPayload;
+  assets: IAssets;
+  liabilities: ILiabilities;
 }
 
 class DashboardController extends Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
+      loading: false,
       selectedCurrency: "CAD",
+      totalAssets: 0,
+      totalLiabilities: 0,
+      netWorth: 0,
       assets: {
-        chequing: 0.0,
-        savingTaxes: 0.0,
-        rainyDay: 0.0,
-        savingFun: 0.0,
-        savingTravel: 0.0,
-        savingPD: 0.0,
-        invest1: 0.0,
-        invest2: 0.0,
-        invest3: 0.0,
-        primaryHome: 0.0,
-        secondHome: 0.0,
-        other: 0.0,
+        chequing: "",
+        savingTaxes: "",
+        rainyDay: "",
+        savingFun: "",
+        savingTravel: "",
+        savingPD: "",
+        invest1: "",
+        invest2: "",
+        invest3: "",
+        primaryHome: "",
+        secondHome: "",
+        other: "",
       },
       liabilities: {
-        creditCard1: 0.0,
-        creditCard2: 0.0,
-        mortgage1: 0.0,
-        mortgage2: 0.0,
-        lineCredit: 0.0,
-        investmentLoan: 0.0,
+        creditCard1: "",
+        creditCard2: "",
+        mortgage1: "",
+        mortgage2: "",
+        lineCredit: "",
+        investmentLoan: "",
       },
     };
   }
 
+  componentDidMount = (): void => {
+    this.retrieveRates();
+  };
+
+  /**
+   * Take home specification: Call REST API to determine currency conversion rates.
+   */
+  retrieveRates = async (): Promise<void> => {
+    try {
+      this.setState(() => ({ loading: true }));
+      const res = await fetchTimeout("/api/exchange");
+      const rates = await res.json();
+      this.setState(() => ({ rates }));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      this.setState(() => ({ loading: false }));
+    }
+  };
+
+  /**
+   * Take home specification: Call REST API to calculate total assets, liabilities, and net worth.
+   */
+  calculateNetWorth = async (
+    curAssets: IAssets,
+    curLiabilities: ILiabilities
+  ): Promise<void> => {
+    try {
+      this.setState(() => ({ loading: true }));
+      const res = await fetchTimeout("/api/networth", {
+        method: "POST",
+        body: JSON.stringify({
+          assets: Object.values(curAssets),
+          liabilities: Object.values(curLiabilities),
+        }),
+      });
+      const { totalAssets, totalLiabilities, netWorth } = await res.json();
+      this.setState(() => ({ totalAssets, totalLiabilities, netWorth }));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      this.setState(() => ({ loading: false }));
+    }
+  };
+
   handleCurrencySelect: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
-    this.setState({ selectedCurrency: e.target.value });
-    // todo: update all assets and liability calculations
+    if (this.state.rates) {
+      const prevCurrency = this.state.selectedCurrency;
+      const nextCurrency: currency = e.target.value as currency;
+      const { assets, liabilities } = convertCurrency(
+        prevCurrency,
+        nextCurrency,
+        this.state.rates,
+        {
+          assets: this.state.assets,
+          liabilities: this.state.liabilities,
+        }
+      );
+      this.setState({ assets, liabilities, selectedCurrency: nextCurrency });
+      this.calculateNetWorth(assets, liabilities);
+    }
+  };
+
+  handleOnBlur: FocusEventHandler = async () => {
+    this.calculateNetWorth(this.state.assets, this.state.liabilities);
+  };
+
+  handleAssetChange = (assetKey: keyof IAssets) => {
+    return (valueAsString: string): void => {
+      const assetChange = { ...this.state.assets, [assetKey]: valueAsString };
+      this.setState(() => ({ assets: assetChange }));
+    };
+  };
+
+  handleLiabilityChange = (liabilityKey: keyof ILiabilities) => {
+    return (valueAsString: string): void => {
+      const liabilityChange = {
+        ...this.state.liabilities,
+        [liabilityKey]: valueAsString,
+      };
+      this.setState(() => ({ liabilities: liabilityChange }));
+    };
   };
 
   render = (): JSX.Element => (
     <DashboardView
-      currency={this.state.selectedCurrency}
+      loading={this.state.loading}
+      selectedCurrency={this.state.selectedCurrency}
+      totalAssets={this.state.totalAssets}
+      totalLiabilities={this.state.totalLiabilities}
+      netWorth={this.state.netWorth}
       assets={this.state.assets}
       liabilities={this.state.liabilities}
-
       handleCurrencySelect={this.handleCurrencySelect}
+      handleAssetChange={this.handleAssetChange}
+      handleLiabilityChange={this.handleLiabilityChange}
+      handleOnBlur={this.handleOnBlur}
     />
   );
 }
