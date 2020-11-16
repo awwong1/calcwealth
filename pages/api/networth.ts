@@ -23,7 +23,10 @@ const _parseFloatZero = (val: number | string): number => {
  * net worth is the total assets minus the total liabilities.
  */
 export default (req: NextApiRequest, res: NextApiResponse): void => {
-  const { method, body }: { method?: string; body: string } = req;
+  const {
+    method,
+    body,
+  }: { method?: string; body: string | Record<string, unknown> } = req;
   if (method != "POST") {
     res.setHeader("Allow", ["POST"]);
     res.status(405).end(`Method ${method} Not Allowed`);
@@ -32,7 +35,12 @@ export default (req: NextApiRequest, res: NextApiResponse): void => {
   const add = (a: number | string, b: number | string): number =>
     _parseFloatZero(a) + _parseFloatZero(b);
 
-  const payload: IPayload = JSON.parse(body);
+  let payload: IPayload;
+  try {
+    payload = JSON.parse(body as string);
+  } catch {
+    payload = (body as unknown) as IPayload;
+  }
   const totalAssets = payload.assets.reduce(add, 0) as number;
   const totalLiabilities = payload.liabilities.reduce(add, 0) as number;
   const netWorth = totalAssets - totalLiabilities;
