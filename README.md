@@ -47,6 +47,12 @@ yarn run cypress open
 
 The test suite will open and simulate a new browser which will visit and request from our existing development site.
 
+## Presentation
+
+Please find the slides for the assessment presentation available:
+* [Google Slides view](https://docs.google.com/presentation/d/1VWSHJOP8yb_mGviXa46-m0r7-XD-PI5xd9naXQOESMI/edit?usp=sharing)
+* as a [PDF form](https://media.udia.ca/2020/11/19/Intuit%20Interview%20Presentation%20-%20Alexander%20Wong.pdf)
+
 ## License
 
 [Apache V2.0](LICENSE)
