@@ -1,23 +1,13 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import fetchTimeout from "../../utils/fetchTimeout";
 import fs from "fs";
-import { SUPPORTED_CURRENCIES } from "../../utils/convertCurrency";
 
 export interface ratesPayload {
-  "rates": {
-    "CAD": number,
-    "INR": number,
-    "EUR": number,
-    "HKD": number,
-    "MXN": number,
-    "USD": number,
-    "GBP": number,
-    "KRW": number,
-    "CNY": number,
-    "JPY": number
+  conversion_rates: {
+    [index: string]: number
   },
-  "base": string,
-  "date": string
+  "base_code": string,
+  "time_last_update_utc": string
 }
 
 /**
@@ -26,10 +16,10 @@ export interface ratesPayload {
  *
  * https://exchangeratesapi.io
  */
-export default (
+export default async (
   req: NextApiRequest,
   res: NextApiResponse
-): Promise<void> | void => {
+): Promise<void> => {
   const { method } = req;
   if (method != "GET") {
     res.setHeader("Allow", ["GET"]);
@@ -37,23 +27,27 @@ export default (
     return;
   }
 
+  const EXCHANGE_RATE_API_SECRET = process.env.EXCHANGE_RATE_API_SECRET || "";
   // Query the exchangeratesapi with the provided base, or fallback
-  const symbols = SUPPORTED_CURRENCIES.join(",");
-  return fetchTimeout(
-    `https://api.exchangeratesapi.io/latest?base=CAD&symbols=${symbols}`
-  )
-    .then((resp) => resp.json())
-    .then((jsonResp) => {
-      res.statusCode = 200;
-      res.setHeader("Content-Type", "application/json");
-      res.end(JSON.stringify(jsonResp));
-    })
-    .catch((err) => {
-      // Robust handling of timeout or network errors
-      console.error(err);
-      // Serve the fallback file
-      res.statusCode = 200;
-      res.setHeader("Content-Type", "application/json");
-      res.end(fs.readFileSync("pages/api/rate_fallback.json").toString());
-    });
+  try {
+    const resp = await fetchTimeout(
+      `https://v6.exchangerate-api.com/v6/${EXCHANGE_RATE_API_SECRET}/latest/CAD`
+    );
+    const payload = await resp.json();
+
+    if (!("conversion_rates" in payload) || !("CAD" in payload.conversion_rates)) {
+      throw "payload missing CAD conversion rates";
+    }
+
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "application/json");
+    res.end(JSON.stringify(payload));
+  } catch (error) {
+    // Robust handling of timeout or network errors
+    console.error(error);
+    // Serve the fallback file
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "application/json");
+    res.end(fs.readFileSync("pages/api/CAD.json").toString());
+  }
 };

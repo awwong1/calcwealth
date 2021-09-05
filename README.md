@@ -9,13 +9,16 @@ This is a [Node.js](https://nodejs.org/en/) & [Next.js](https://nextjs.org/) pro
 
 ## Getting Started
 
-First, run the development server:
+Go to [exchangerate-api.com](https://exchangerate-api.com) and get an API key. Ensure that it is put in the environment as `EXCHANGE_RATE_API_SECRET`.
 
+Run the development server:
 ```bash
 yarn
 yarn dev
+```
 
-# Alternatively an optimized version of the application can be run with
+Alternatively an optimized version of the application can be run with:
+```bash
 yarn build
 yarn start
 ```

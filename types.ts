@@ -1,15 +1,3 @@
-export type currency =
-  | "CAD"
-  | "USD"
-  | "EUR"
-  | "JPY"
-  | "CNY"
-  | "HKD"
-  | "MXN"
-  | "GBP"
-  | "KRW"
-  | "INR";
-
 export interface IAssets {
   chequing: number | string;
   savingTaxes: number | string;

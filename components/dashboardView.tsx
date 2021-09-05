@@ -1,4 +1,5 @@
 import {
+  Badge,
   Container,
   Divider,
   Grid,
@@ -12,17 +13,18 @@ import {
   StatNumber,
   Text,
 } from "@chakra-ui/react";
-import { currency, IAssets, ILiabilities } from "../types";
+import { IAssets, ILiabilities } from "../types";
 import {
   formatCurrency,
-  getCurrencyName,
-  SUPPORTED_CURRENCIES,
+  getCurrencyName
 } from "../utils/convertCurrency";
 import NumberEditable from "./numberEditable";
 
 interface IProps {
   loading: boolean;
-  selectedCurrency: currency;
+  selectedCurrency: string;
+  selectedRate?: number;
+  supportedCurrencies: string[];
   netWorth?: number;
   totalAssets?: number;
   totalLiabilities?: number;
@@ -43,6 +45,8 @@ interface IProps {
 const DashboardView = ({
   loading,
   selectedCurrency,
+  selectedRate,
+  supportedCurrencies,
   netWorth,
   totalAssets,
   totalLiabilities,
@@ -61,13 +65,16 @@ const DashboardView = ({
         alignItems="center"
         gridTemplateColumns={"auto auto auto"}
         gridTemplateRows="auto"
-        gridTemplateAreas={`". currency currencySelect"`}
+        gridTemplateAreas={`". exchangeRate currency currencySelect"`}
       >
         {/* Currency selector*/}
-        <GridItem gridArea="currency" justifySelf="end">
-          <Heading as="h6" size="xs">
+        <GridItem gridArea="currency" justifySelf="end" alignSelf="end">
+          <Heading as="h6" size="xs" textAlign="end">
             Select Currency
           </Heading>
+          {selectedRate !== undefined &&
+            <><Badge>{formatCurrency(1, "CAD")}</Badge> = <Badge>{formatCurrency(selectedRate, selectedCurrency)}</Badge></>
+          }
         </GridItem>
         <GridItem gridArea="currencySelect">
           <Select
@@ -75,7 +82,7 @@ const DashboardView = ({
             value={selectedCurrency}
             onChange={handleCurrencySelect}
           >
-            {SUPPORTED_CURRENCIES.map((curCode) => (
+            {supportedCurrencies.map((curCode) => (
               <option key={curCode} value={curCode}>
                 {getCurrencyName(curCode)}
               </option>

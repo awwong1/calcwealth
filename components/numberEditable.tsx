@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Input, NumberInput, NumberInputField } from "@chakra-ui/react";
 
 interface IProps {
+  id?: string;
   numericValue: number | string;
   displayValue: string;
   handleChangeInput: (valueAsString: string, valueAsNumber: number) => void;
@@ -12,6 +13,7 @@ interface IProps {
  * @param param0
  */
 const NumberEditable = ({
+  id,
   numericValue,
   displayValue,
   handleChangeInput,
@@ -32,6 +34,7 @@ const NumberEditable = ({
     <>
       {isEditing ? (
         <NumberInput
+          id={id}
           value={numericValue}
           onBlur={(e) => {
             setIsEditing(false);
@@ -44,6 +47,7 @@ const NumberEditable = ({
         </NumberInput>
       ) : (
         <Input
+          id={id}
           value={displayValue}
           isReadOnly={true}
           onFocusCapture={() => setIsEditing(true)}

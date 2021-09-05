@@ -1,5 +1,7 @@
 /// <reference types="cypress" />
 
+const TIMEOUT_MS = 1000;
+
 export default context("Dashboard User Interface", () => {
   beforeEach(() => {
     cy.visit("http://localhost:3000").as("index");
@@ -11,6 +13,7 @@ export default context("Dashboard User Interface", () => {
 
   it("should update the selected currency", () => {
     cy.get("@index")
+      .wait(TIMEOUT_MS)
       .get("select")
       .select("USD")
       .contains("US Dollar")
@@ -21,6 +24,7 @@ export default context("Dashboard User Interface", () => {
 
   it("should update on asset change", () => {
     cy.get("@index")
+      .wait(TIMEOUT_MS)
       .get("input") // get input element
       .first() // get first line item `chequing`
       .focus() // focus the element (editable Component switch)
@@ -28,6 +32,7 @@ export default context("Dashboard User Interface", () => {
       .type("123.45"); // add 123.45 string
 
     cy.get("@index") // from DOM root
+      .wait(TIMEOUT_MS)
       .get("dl") // get all the stat groups
       .first() // get the Net Worth stat group
       .click() // Unfocus the input field
@@ -36,6 +41,7 @@ export default context("Dashboard User Interface", () => {
       .contains("CA$123.45"); // description list term contains currency formatted value
 
     cy.get("@index") // from DOM root
+      .wait(TIMEOUT_MS)
       .get("dl") // get all the stat groups
       .eq(1) // get the Total Assets stat group
       .contains("Total Assets") // Make sure it is the total assets field
@@ -43,6 +49,7 @@ export default context("Dashboard User Interface", () => {
       .contains("CA$123.45"); // description list term contains currency formatted value
 
     cy.get("@index") // from DOM root
+      .wait(TIMEOUT_MS)
       .get("dl") // get all the stat groups
       .eq(2) // get the Total liabilities stat group
       .contains("Total Liabilities") // Make sure it is the total liabilities field
@@ -52,6 +59,7 @@ export default context("Dashboard User Interface", () => {
 
   it("should update on liability change", () => {
     cy.get("@index")
+      .wait(TIMEOUT_MS)
       .get("input") // get input element
       .last() // get last line item `investmentLoan`
       .focus() // focus the element (editable Component switch)
@@ -59,6 +67,7 @@ export default context("Dashboard User Interface", () => {
       .type("98765"); // add 123.45 string
 
     cy.get("@index") // from DOM root
+      .wait(TIMEOUT_MS)
       .get("dl") // get all the stat groups
       .first() // get the Net Worth stat group
       .click() // Unfocus the input field
@@ -67,6 +76,7 @@ export default context("Dashboard User Interface", () => {
       .contains("-CA$98,765.00"); // description list term contains currency formatted value
 
     cy.get("@index") // from DOM root
+      .wait(TIMEOUT_MS)
       .get("dl") // get all the stat groups
       .eq(1) // get the Total Assets stat group
       .contains("Total Assets") // Make sure it is the total assets field
@@ -74,6 +84,7 @@ export default context("Dashboard User Interface", () => {
       .contains("CA$0.00"); // description list term contains currency formatted value
 
     cy.get("@index") // from DOM root
+      .wait(TIMEOUT_MS)
       .get("dl") // get all the stat groups
       .eq(2) // get the Total liabilities stat group
       .contains("Total Liabilities") // Make sure it is the total liabilities field

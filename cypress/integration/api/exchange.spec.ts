@@ -19,8 +19,8 @@ export default context("Exchange API Endpoint", () => {
   it("should validate the payload keys", () => {
     cy.get("@rate")
       .its("body")
-      .should("include.keys", ["rates", "base", "date"])
-      .its("rates")
+      .should("include.keys", ["conversion_rates", "base_code", "time_last_update_utc"])
+      .its("conversion_rates")
       .should("include.keys", [
         "CAD",
         "USD",

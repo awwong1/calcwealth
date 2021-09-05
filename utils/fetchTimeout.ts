@@ -1,7 +1,7 @@
 const fetchTimeout = (
   input: RequestInfo,
   init?: RequestInit,
-  timeoutMs = 7000
+  timeoutMs = 500
 ): Promise<Response> => {
   let didTimeOut = false;
 

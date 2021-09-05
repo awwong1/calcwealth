@@ -2,21 +2,7 @@ import "@formatjs/intl-displaynames/polyfill";
 import "@formatjs/intl-displaynames/locale-data/en"; // locale-data for en
 import { createIntl, createIntlCache } from "@formatjs/intl";
 import { ratesPayload } from "../pages/api/exchange";
-import { currency, IAssets, ILiabilities } from "../types";
-
-// ISO 4217 formatted 3 letter currency code
-export const SUPPORTED_CURRENCIES: currency[] = [
-  "CAD",
-  "USD",
-  "EUR",
-  "JPY",
-  "CNY",
-  "HKD",
-  "MXN",
-  "GBP",
-  "KRW",
-  "INR",
-];
+import { IAssets, ILiabilities } from "../types";
 
 const cache = createIntlCache();
 const intl = createIntl(
@@ -28,13 +14,13 @@ const intl = createIntl(
 );
 
 export const convertCurrency = (
-  prevCurrency: currency,
-  nextCurrency: currency,
-  { rates }: ratesPayload,
+  prevCurrency: string,
+  nextCurrency: string,
+  { conversion_rates }: ratesPayload,
   { assets, liabilities }: { assets: IAssets; liabilities: ILiabilities }
 ): { assets: IAssets; liabilities: ILiabilities } => {
-  const base = rates[prevCurrency];
-  const multiplier = rates[nextCurrency];
+  const base = conversion_rates[prevCurrency];
+  const multiplier = conversion_rates[nextCurrency];
 
   const convert = ([key, value]: [string, string | number]) => {
     let numValue: number;
@@ -63,7 +49,7 @@ export const convertCurrency = (
 
 export const formatCurrency = (
   value: number | string,
-  cur: currency
+  cur: string
 ): string => {
   if (typeof value === "string") {
     try {
@@ -79,7 +65,7 @@ export const formatCurrency = (
   }
 };
 
-export const getCurrencyName = (value: currency): string | undefined =>
+export const getCurrencyName = (value: string): string | undefined =>
   intl.formatDisplayName(value, { type: "currency" });
 
-export default { SUPPORTED_CURRENCIES, intl, getCurrencyName };
+export default { intl, getCurrencyName };

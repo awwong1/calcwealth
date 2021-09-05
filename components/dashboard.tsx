@@ -2,14 +2,14 @@ import { Component, FocusEventHandler } from "react";
 import DashboardView from "./dashboardView";
 import fetchTimeout from "../utils/fetchTimeout";
 import { ratesPayload } from "../pages/api/exchange";
-import { currency, IAssets, ILiabilities } from "../types";
+import { IAssets, ILiabilities } from "../types";
 import { convertCurrency } from "../utils/convertCurrency";
 
 type IProps = Record<string, unknown>;
 
 interface IState {
   loading: boolean;
-  selectedCurrency: currency;
+  selectedCurrency: string;
   totalAssets: number;
   totalLiabilities: number;
   netWorth: number;
@@ -100,7 +100,7 @@ class DashboardController extends Component<IProps, IState> {
   handleCurrencySelect: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
     if (this.state.rates) {
       const prevCurrency = this.state.selectedCurrency;
-      const nextCurrency: currency = e.target.value as currency;
+      const nextCurrency = e.target.value;
       const { assets, liabilities } = convertCurrency(
         prevCurrency,
         nextCurrency,
@@ -136,10 +136,15 @@ class DashboardController extends Component<IProps, IState> {
     };
   };
 
-  render = (): JSX.Element => (
-    <DashboardView
+  render = (): JSX.Element => {
+    const { conversion_rates } = this.state.rates || { conversion_rates: {} };
+    const selectedRate = conversion_rates[this.state.selectedCurrency];
+    const supportedCurrencies = Object.keys(conversion_rates) || ["CAD"];
+    return <DashboardView
       loading={this.state.loading}
       selectedCurrency={this.state.selectedCurrency}
+      selectedRate={selectedRate}
+      supportedCurrencies={supportedCurrencies}
       totalAssets={this.state.totalAssets}
       totalLiabilities={this.state.totalLiabilities}
       netWorth={this.state.netWorth}
@@ -150,7 +155,7 @@ class DashboardController extends Component<IProps, IState> {
       handleLiabilityChange={this.handleLiabilityChange}
       handleOnBlur={this.handleOnBlur}
     />
-  );
+  };
 }
 
 export default DashboardController;
