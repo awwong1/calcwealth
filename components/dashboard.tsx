@@ -62,7 +62,7 @@ class DashboardController extends Component<IProps, IState> {
   retrieveRates = async (): Promise<void> => {
     try {
       this.setState(() => ({ loading: true }));
-      const res = await fetchTimeout("/api/exchange");
+      const res = await fetchTimeout("/api/exchange", undefined, 2000);
       const rates = await res.json();
       this.setState(() => ({ rates }));
     } catch (err) {
